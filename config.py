@@ -1,5 +1,5 @@
 # backend/config.py
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 import logging
 
@@ -30,9 +30,11 @@ class Settings(BaseSettings):
     APP_NAME: str = "HealthAI Backend"
     DEBUG: bool = Field(True, env="DEBUG")
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # Pydantic v2 config
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8"
+    )
 
 # Create singleton settings object
 settings = Settings()
