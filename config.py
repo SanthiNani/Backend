@@ -1,37 +1,41 @@
 # backend/config.py
-import os
-from dotenv import load_dotenv
-from pydantic import BaseSettings
+from pydantic import BaseSettings, Field
+import logging
 
-
-# Load .env file
-load_dotenv()
+# Setup basic logging
+logging.basicConfig(level=logging.INFO)
 
 class Settings(BaseSettings):
     # Supabase
-    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
+    SUPABASE_URL: str = Field(..., env="SUPABASE_URL")
+    SUPABASE_KEY: str = Field(..., env="SUPABASE_KEY")
 
     # JWT
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "your-strong-jwt-secret")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
-    JWT_EXPIRY_MINUTES: int = int(os.getenv("JWT_EXPIRY_MINUTES", 1440))
+    JWT_SECRET: str = Field("your-strong-jwt-secret", env="JWT_SECRET")
+    JWT_ALGORITHM: str = Field("HS256", env="JWT_ALGORITHM")
+    JWT_EXPIRY_MINUTES: int = Field(1440, env="JWT_EXPIRY_MINUTES")
 
     # Hugging Face
-    HUGGINGFACE_API_KEY: str = os.getenv("HF_API_KEY", "")
-    HUGGINGFACE_MODEL_NAME: str = os.getenv("HF_MODEL", "distilbert-base-uncased")
-    print("Hugging Face API Key:", HUGGINGFACE_API_KEY)
+    HUGGINGFACE_API_KEY: str = Field(..., env="HF_API_KEY")
+    HUGGINGFACE_MODEL_NAME: str = Field("distilbert-base-uncased", env="HF_MODEL")
 
-
-    # Redis (ensure REDIS_PASSWORD defaults to empty string if None)
-    REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
-    REDIS_PORT: int = int(os.getenv("REDIS_PORT", 6379))
-    REDIS_DB: int = int(os.getenv("REDIS_DB", 0))
-    REDIS_PASSWORD: str = os.getenv("REDIS_PASSWORD") or ""
+    # Redis
+    REDIS_HOST: str = Field("localhost", env="REDIS_HOST")
+    REDIS_PORT: int = Field(6379, env="REDIS_PORT")
+    REDIS_DB: int = Field(0, env="REDIS_DB")
+    REDIS_PASSWORD: str = Field("", env="REDIS_PASSWORD")
 
     # Project
     APP_NAME: str = "HealthAI Backend"
-    DEBUG: bool = os.getenv("DEBUG", "True").lower() in ["true", "1", "yes"]
+    DEBUG: bool = Field(True, env="DEBUG")
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
 # Create singleton settings object
 settings = Settings()
+
+# Log important info (optional)
+logging.info(f"App: {settings.APP_NAME}, Debug: {settings.DEBUG}")
+logging.info(f"Hugging Face Model: {settings.HUGGINGFACE_MODEL_NAME}")
