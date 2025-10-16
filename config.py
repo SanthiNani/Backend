@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     JWT_EXPIRY_MINUTES: int = Field(1440, env="JWT_EXPIRY_MINUTES")
 
     # Hugging Face
-    HUGGINGFACE_API_KEY: str = Field(..., env="HF_API_KEY")
+    HUGGINGFACE_API_KEY: str = Field(..., env="HUGGINGFACE_API_KEY")
     HUGGINGFACE_MODEL_NAME: str = Field("distilbert-base-uncased", env="HF_MODEL")
 
     # Redis
